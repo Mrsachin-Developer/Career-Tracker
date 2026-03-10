@@ -23,14 +23,44 @@ export const createApplication = async (
   return application;
 };
 
-export const getApplications = async (userId: string) => {
+export const getApplications = async (userId: string, query: any) => {
+  const page = Number(query.page) || 1;
+  const limit = Number(query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  const search = query.search || "";
+  const status = query.status;
+  const where: any = {
+    userId,
+  };
+
+  if (search) {
+    // Adding a New Property to the Object
+    where.company = {
+      contains: search,
+      mode: "insensitive",
+    };
+  }
+  //So the object becomes:
+  //   where = {
+  //   userId: "u123",
+  //   company: {
+  //     contains: "google",
+  //     mode: "insensitive"
+  //   }
+  // }
+
+  if (status) {
+    where.status = status;
+  }
+
   const applications = await client.application.findMany({
-    where: {
-      userId,
-    },
+    where,
     orderBy: {
       createdAt: "desc",
     },
+    skip,
+    take: limit,
   });
 
   return applications;

@@ -34,7 +34,7 @@ export const getApplicationsController = async (
 ) => {
   const userId = req.user.id;
 
-  const applications = await getApplications(userId);
+  const applications = await getApplications(userId, req.query);
 
   res.json({
     success: true,
